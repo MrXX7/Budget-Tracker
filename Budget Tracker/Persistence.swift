@@ -13,7 +13,7 @@ struct PersistenceController {
     let container: NSPersistentContainer
 
     init(inMemory: Bool = false) {
-        container = NSPersistentContainer(name: "TransactionModel") // The name should match the .xcdatamodeld file
+        container = NSPersistentContainer(name: "TransactionModel") // Ensure this matches your .xcdatamodeld file
 
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
@@ -26,4 +26,5 @@ struct PersistenceController {
         }
     }
 }
+
 

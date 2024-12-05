@@ -6,8 +6,11 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ContentView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+
     @State private var category: String = "Food"
     @State private var amount: String = ""
     @State private var date: Date = Date()
@@ -54,11 +57,28 @@ struct ContentView: View {
     }
     
     func saveTransaction() {
-        // Save transaction logic will go here
-        print("Transaction saved: \(category), \(amount), \(date), \(description)")
+        // Validate the amount as a valid Double
+        guard let amountValue = Double(amount), !amount.isEmpty else {
+            print("Invalid amount")
+            return
+        }
+
+        // Create a new TransactionEntity
+        let newTransaction = TransactionEntity(context: viewContext)
+        newTransaction.category = category
+        newTransaction.amount = amountValue
+        newTransaction.date = date
+        newTransaction.transactionDescription = description
+
+        // Save the new transaction to Core Data
+        do {
+            try viewContext.save()
+            print("Transaction saved: \(category), \(amount), \(date), \(description)")
+        } catch {
+            print("Error saving transaction: \(error.localizedDescription)")
+        }
     }
 }
-
 
 #Preview {
     ContentView()

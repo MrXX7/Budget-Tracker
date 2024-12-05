@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct EditTransactionView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -22,7 +23,7 @@ struct EditTransactionView: View {
         self._isPresented = isPresented
         self.transaction = transaction
         
-        // Pre-fill fields with transaction details
+        // Pre-fill fields with transaction details, safely unwrapping optionals
         self._category = State(initialValue: transaction.category ?? "Food")
         self._amount = State(initialValue: "\(transaction.amount)")
         self._date = State(initialValue: transaction.date ?? Date())
@@ -62,13 +63,19 @@ struct EditTransactionView: View {
     }
     
     func saveChanges() {
-        guard let amountValue = Double(amount) else { return }
+        // Ensure the amount is a valid Double
+        guard let amountValue = Double(amount), !amount.isEmpty else {
+            print("Invalid amount")
+            return
+        }
         
+        // Update the transaction entity with new values
         transaction.category = category
         transaction.amount = amountValue
         transaction.date = date
         transaction.transactionDescription = description
         
+        // Save the changes to Core Data
         do {
             try viewContext.save()
             isPresented = false
@@ -77,4 +84,6 @@ struct EditTransactionView: View {
         }
     }
 }
+
+
 
